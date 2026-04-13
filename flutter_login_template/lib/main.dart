@@ -25,10 +25,10 @@ class MyApp extends StatelessWidget {
 
       // routing semua halaman
       routes: {
-        '/splash': (context) => const SplashScreen(),
-        '/welcome': (context) => const WelcomeScreen(),
-        '/chat': (context) => const ChatWelcomeScreen(),
-        '/onboarding': (context) => const FoodAppOnboardingScreen(),
+        '/splash': (context) => SplashScreen(),
+        '/welcome': (context) => WelcomeScreen(),
+        '/chat': (context) => ChatWelcomeScreen(),
+        '/onboarding': (context) => OnboardingScreen(),
       },
     );
   }
