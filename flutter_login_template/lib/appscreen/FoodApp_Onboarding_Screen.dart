@@ -9,6 +9,7 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   int currentPage = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,10 +43,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
             const Spacer(flex: 2),
+
+            /// 🔥 TOMBOL SUDAH ADA AKSI
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, '/splash');
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF22A45D),
                   foregroundColor: Colors.white,
@@ -57,6 +62,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Text("Get Started".toUpperCase()),
               ),
             ),
+
             const Spacer(),
           ],
         ),
@@ -133,7 +139,7 @@ class DotIndicator extends StatelessWidget {
   }
 }
 
-// Demo data for our Onboarding screen
+// Demo data
 List<Map<String, dynamic>> demoData = [
   {
     "illustration": "https://i.postimg.cc/L43CKddq/Illustrations.png",

@@ -34,14 +34,19 @@ class ChatWelcomeScreen extends StatelessWidget {
               ),
             ),
             const Spacer(flex: 3),
+
+            /// 🔥 TOMBOL SUDAH ADA AKSI
             TextButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/onboarding');
+              },
               icon: const Text("Skip"),
               label: const Icon(
                 Icons.arrow_forward_ios,
                 size: 20,
               ),
             ),
+
             const Spacer(),
           ],
         ),

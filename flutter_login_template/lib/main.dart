@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'appscreen/splash_screen.dart';
 import 'appscreen/welcome_screen.dart';
 import 'appscreen/chat_welcome_screen.dart';
-import 'appscreen/FoodApp_Onboarding_Screen.dart';
+import 'appscreen/foodapp_onboarding_screen.dart';
 
 void main() {
   runApp(const MyApp());

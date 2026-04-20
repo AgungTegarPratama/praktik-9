@@ -9,6 +9,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   int currentPage = 0;
+
   List<Map<String, String>> splashData = [
     {
       "text": "Welcome to Tokoto, Let’s shop!",
@@ -24,6 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
       "image": "https://i.postimg.cc/wRtVxqR2/splash-3.png"
     },
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,9 +75,11 @@ class _SplashScreenState extends State<SplashScreen> {
                         ),
                       ),
                       const Spacer(flex: 3),
+
+                      /// 🔥 TOMBOL SUDAH ADA AKSI
                       ElevatedButton(
                         onPressed: () {
-                          // Navigate to Sign In Screen or any other screen
+                          Navigator.pushNamed(context, '/welcome');
                         },
                         style: ElevatedButton.styleFrom(
                           elevation: 0,
@@ -83,11 +87,13 @@ class _SplashScreenState extends State<SplashScreen> {
                           foregroundColor: Colors.white,
                           minimumSize: const Size(double.infinity, 48),
                           shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(16)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(16)),
                           ),
                         ),
                         child: const Text("Continue"),
                       ),
+
                       const Spacer(),
                     ],
                   ),
@@ -107,6 +113,7 @@ class SplashContent extends StatefulWidget {
     this.text,
     this.image,
   }) : super(key: key);
+
   final String? text, image;
 
   @override
