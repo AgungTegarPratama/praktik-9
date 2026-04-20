@@ -1,9 +1,27 @@
 import 'package:flutter/material.dart';
-// pastikan sudah install flutter_svg di pubspec.yaml
 import 'package:flutter_svg/flutter_svg.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,19 +45,37 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const Spacer(flex: 2),
 
-              /// 🔥 SUDAH ADA NAVIGASI
-              ErrorInfo(
-                title: "Hello and Welcome",
-                description:
-                    "We're setting things up for you. This will only take a moment.",
-                button: Transform.scale(
-                  scale: 1.8,
-                  child: const CircularProgressIndicator.adaptive(),
-                ),
-                press: () {
-                  Navigator.pushNamed(context, '/chat');
-                },
-              ),
+              _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.black,
+                      ),
+                    )
+                  : ErrorInfo(
+                      title: "Hello and Welcome",
+                      description:
+                          "We're setting things up for you. This will only take a moment.",
+                      button: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/chat');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 48),
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)),
+                          ),
+                        ),
+                        child: const Text("CONTINUE"),
+                      ),
+                      press: () {
+                        Navigator.pushNamed(context, '/chat');
+                      },
+                    ),
+
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -87,8 +123,6 @@ class ErrorInfo extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16 * 2.5),
-
-            /// tombol / loader
             button ??
                 ElevatedButton(
                   onPressed: press,
@@ -102,7 +136,6 @@ class ErrorInfo extends StatelessWidget {
                   ),
                   child: Text((btnText ?? "Retry").toUpperCase()),
                 ),
-
             const SizedBox(height: 16),
           ],
         ),

@@ -11,7 +11,12 @@ class ChatWelcomeScreen extends StatelessWidget {
         child: Column(
           children: [
             const Spacer(flex: 2),
-            Image.network("https://i.postimg.cc/Qtxc8xgv/welcome-image.png"),
+            Image.asset(
+            "assets/images/splash-4.png",
+            height: 300,
+            width: double.infinity,
+            fit: BoxFit.contain,
+          ),
             const Spacer(flex: 3),
             Text(
               "Welcome to our freedom \nmessaging app",
