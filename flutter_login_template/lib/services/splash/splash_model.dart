@@ -1,7 +1,7 @@
 class SplashModel {
-  String imageUrl;
-  String title;
-  String description;
+  final String imageUrl;
+  final String title;
+  final String description;
 
   SplashModel({
     required this.imageUrl,
@@ -11,9 +11,9 @@ class SplashModel {
 
   factory SplashModel.fromJson(Map<String, dynamic> json) {
     return SplashModel(
-      imageUrl: json['image_url'],
-      title: json['title'],
-      description: json['description'],
+      imageUrl: json['image_url'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
     );
   }
 }

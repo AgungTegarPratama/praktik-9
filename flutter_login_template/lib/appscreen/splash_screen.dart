@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
 import '../services/splash/splash_service.dart';
 import '../services/splash/splash_model.dart';
 
@@ -13,50 +12,39 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   int currentPage = 0;
 
-  String apiMessage = "Checking API...";
-
-  List<Map<String, String>> splashData = [
-    {
-      "text": "Welcome to Tokoto, Let’s shop!",
-      "image": "assets/images/splash-1.png"
-    },
-    {
-      "text":
-          "We help people conect with store \naround United State of America",
-      "image": "assets/images/splash-2.png"
-    },
-    {
-      "text": "We show the easy way to shop. \nJust stay at home with us",
-      "image": "assets/images/splash-3.png"
-    },
-  ];
+  List<SplashModel> splashData = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    checkAPI();
+    loadSplashData();
   }
 
-  Future<void> checkAPI() async {
+  Future<void> loadSplashData() async {
     try {
-      String result = await ApiService.checkKelompok4();
-
-      print(result);
+      final data = await SplashService.fetchSplashData();
 
       setState(() {
-        apiMessage = result;
+        splashData = data;
+        isLoading = false;
       });
     } catch (e) {
       print(e);
-
       setState(() {
-        apiMessage = "API gagal terhubung";
+        isLoading = false;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       body: SafeArea(
         child: SizedBox(
@@ -77,8 +65,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
                   itemBuilder: (context, index) {
                     return SplashContent(
-                      image: splashData[index]["image"],
-                      text: splashData[index]["text"],
+                      image: splashData[index].imageUrl,
+                      text: splashData[index].title,
+                      desc: splashData[index].description,
                     );
                   },
                 ),
@@ -113,18 +102,6 @@ class _SplashScreenState extends State<SplashScreen> {
                       ),
 
                       const Spacer(),
-
-                      Text(
-                        apiMessage,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
-
-                      const SizedBox(height: 25,
-                      ),
 
                       ElevatedButton(
                         onPressed: () {
@@ -161,11 +138,13 @@ class _SplashScreenState extends State<SplashScreen> {
 class SplashContent extends StatelessWidget {
   final String? text;
   final String? image;
+  final String? desc;
 
   const SplashContent({
     super.key,
     this.text,
     this.image,
+    this.desc,
   });
 
   @override
@@ -185,14 +164,26 @@ class SplashContent extends StatelessWidget {
         ),
 
         Text(
-          text!, textAlign: TextAlign.center,
+          text ?? '',
+          textAlign: TextAlign.center,
+        ),
+
+        const SizedBox(height: 10),
+
+        Text(
+          desc ?? '',
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.grey),
         ),
 
         const Spacer(flex: 2),
 
-        Image.asset(
-          image!, fit: BoxFit.contain,
-          height: 265, width: 235),
+        Image.network(
+          image ?? '',
+          height: 265,
+          width: 235,
+          fit: BoxFit.contain,
+        ),
 
       ],
     );
