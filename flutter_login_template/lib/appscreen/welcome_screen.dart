@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../services/get_started/get_started_service.dart';
+import '../services/get_started/get_started_model.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -10,10 +12,16 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   bool _isLoading = true;
+  late Future<GetStartedModel> _data;
 
   @override
   void initState() {
     super.initState();
+
+    // ambil data API
+    _data = GetStartedService().fetchData();
+
+    // delay biar tetap ada efek loading 2 detik
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
@@ -28,56 +36,83 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              const Spacer(flex: 2),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: SvgPicture.string(
-                    paymentProcessIllistration,
-                    fit: BoxFit.scaleDown,
-                  ),
-                ),
-              ),
-              const Spacer(flex: 2),
+        child: FutureBuilder<GetStartedModel>(
+          future: _data,
+          builder: (context, snapshot) {
+            
+            // 🔄 Loading
+            if (_isLoading || snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.black),
+              );
+            }
 
-              _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.black,
-                      ),
-                    )
-                  : ErrorInfo(
-                      title: "Hello and Welcome",
-                      description:
-                          "We're setting things up for you. This will only take a moment.",
-                      button: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/chat');
+            // ❌ Error
+            if (snapshot.hasError) {
+              return ErrorInfo(
+                title: "Error",
+                description: "Gagal mengambil data dari server",
+                press: () {},
+              );
+            }
+
+            // ✅ Data dari API
+            final data = snapshot.data!;
+
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  const Spacer(flex: 2),
+
+                  // 🖼️ Gambar dari API (fallback ke SVG kalau gagal)
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Image.network(
+                        data.imageUrl,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return SvgPicture.string(
+                            paymentProcessIllistration,
+                            fit: BoxFit.scaleDown,
+                          );
                         },
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 48),
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(8)),
-                          ),
-                        ),
-                        child: const Text("CONTINUE"),
                       ),
-                      press: () {
+                    ),
+                  ),
+
+                  const Spacer(flex: 2),
+
+                  // 📝 Title & Description dari API
+                  ErrorInfo(
+                    title: data.title,
+                    description: data.description,
+                    button: ElevatedButton(
+                      onPressed: () {
                         Navigator.pushNamed(context, '/chat');
                       },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 48),
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                        ),
+                      ),
+                      child: const Text("CONTINUE"),
                     ),
+                    press: () {
+                      Navigator.pushNamed(context, '/chat');
+                    },
+                  ),
 
-              const SizedBox(height: 16),
-            ],
-          ),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
@@ -116,6 +151,7 @@ class ErrorInfo extends StatelessWidget {
                   .textTheme
                   .headlineSmall!
                   .copyWith(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             Text(
