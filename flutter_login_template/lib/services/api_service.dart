@@ -2,22 +2,28 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
 
- static Future<String> checkKelompok4() async {
+  static Future<String> checkKelompok4() async {
 
-   final url = Uri.parse(
-     'https://api.ppb.widiarrohman.my.id/api/2026/uts/A/kelompok4/check'
-   );
+    final url = Uri.parse(
+      'https://api.ppb.widiarrohman.my.id/api/2026/uts/A/kelompok4/check'
+    );
 
-   final response = await http.get(url);
+    try {
+      final response = await http.get(url).timeout(
+        const Duration(seconds: 10),
+      );
 
-   print(response.statusCode);
-   print(response.body);
+      print("STATUS: ${response.statusCode}");
+      print("BODY: ${response.body}");
 
-   if(response.statusCode == 200){
-      return response.body;
-   }else{
-      throw Exception('API gagal');
-   }
- }
+      if (response.statusCode == 200) {
+        return response.body; // 🔥 LANGSUNG RETURN STRING
+      } else {
+        throw Exception("Status code bukan 200");
+      }
 
+    } catch (e) {
+      throw Exception("Error API: $e");
+    }
+  }
 }
