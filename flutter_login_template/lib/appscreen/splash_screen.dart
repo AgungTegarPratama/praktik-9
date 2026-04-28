@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -10,21 +11,47 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   int currentPage = 0;
 
+  String apiMessage = "Checking API...";
+
   List<Map<String, String>> splashData = [
     {
       "text": "Welcome to Tokoto, Let’s shop!",
-      "image": "https://i.postimg.cc/mhhVywp9/splash-1.png"
+      "image": "assets/images/splash-1.png"
     },
     {
       "text":
           "We help people conect with store \naround United State of America",
-      "image": "https://i.postimg.cc/PNcy3w0R/splash-2.png"
+      "image": "assets/images/splash-2.png"
     },
     {
       "text": "We show the easy way to shop. \nJust stay at home with us",
-      "image": "https://i.postimg.cc/wRtVxqR2/splash-3.png"
+      "image": "assets/images/splash-3.png"
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    checkAPI();
+  }
+
+  Future<void> checkAPI() async {
+    try {
+      String result = await ApiService.checkKelompok4();
+
+      print(result);
+
+      setState(() {
+        apiMessage = result;
+      });
+    } catch (e) {
+      print(e);
+
+      setState(() {
+        apiMessage = "API gagal terhubung";
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,28 +61,36 @@ class _SplashScreenState extends State<SplashScreen> {
           width: double.infinity,
           child: Column(
             children: [
+
               Expanded(
                 flex: 3,
                 child: PageView.builder(
+                  itemCount: splashData.length,
+
                   onPageChanged: (value) {
                     setState(() {
                       currentPage = value;
                     });
                   },
-                  itemCount: splashData.length,
-                  itemBuilder: (context, index) => SplashContent(
-                    image: splashData[index]["image"],
-                    text: splashData[index]['text'],
-                  ),
+
+                  itemBuilder: (context, index) {
+                    return SplashContent(
+                      image: splashData[index]["image"],
+                      text: splashData[index]["text"],
+                    );
+                  },
                 ),
               ),
+
               Expanded(
                 flex: 2,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
-                    children: <Widget>[
+                    children: [
+
                       const Spacer(),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
@@ -74,9 +109,21 @@ class _SplashScreenState extends State<SplashScreen> {
                           ),
                         ),
                       ),
-                      const Spacer(flex: 3),
 
-                      /// 🔥 TOMBOL SUDAH ADA AKSI
+                      const Spacer(),
+
+                      Text(
+                        apiMessage,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+
+                      const SizedBox(height: 25,
+                      ),
+
                       ElevatedButton(
                         onPressed: () {
                           Navigator.pushNamed(context, '/welcome');
@@ -95,10 +142,12 @@ class _SplashScreenState extends State<SplashScreen> {
                       ),
 
                       const Spacer(),
+
                     ],
                   ),
                 ),
               ),
+
             ],
           ),
         ),
@@ -107,25 +156,23 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-class SplashContent extends StatefulWidget {
+class SplashContent extends StatelessWidget {
+  final String? text;
+  final String? image;
+
   const SplashContent({
-    Key? key,
+    super.key,
     this.text,
     this.image,
-  }) : super(key: key);
+  });
 
-  final String? text, image;
-
-  @override
-  State<SplashContent> createState() => _SplashContentState();
-}
-
-class _SplashContentState extends State<SplashContent> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: <Widget>[
+      children: [
+
         const Spacer(),
+
         const Text(
           "TOKOTO",
           style: TextStyle(
@@ -134,17 +181,17 @@ class _SplashContentState extends State<SplashContent> {
             fontWeight: FontWeight.bold,
           ),
         ),
+
         Text(
-          widget.text!,
-          textAlign: TextAlign.center,
+          text!, textAlign: TextAlign.center,
         ),
+
         const Spacer(flex: 2),
-        Image.network(
-          widget.image!,
-          fit: BoxFit.contain,
-          height: 265,
-          width: 235,
-        ),
+
+        Image.asset(
+          image!, fit: BoxFit.contain,
+          height: 265, width: 235),
+
       ],
     );
   }
