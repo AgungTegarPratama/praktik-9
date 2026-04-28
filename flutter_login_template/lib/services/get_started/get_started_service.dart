@@ -5,7 +5,7 @@ import 'get_started_model.dart';
 class GetStartedService {
   Future<GetStartedModel> fetchData() async {
     final response = await http.get(
-      Uri.parse("http://10.0.2.2:8000/api/2026/uts/A/kelompok4/get-started"),
+      Uri.parse("https://api.ppb.widiarrohman.my.id/api/2026/uts/A/kelompok4/get-started"),
     );
 
     if (response.statusCode == 200) {
