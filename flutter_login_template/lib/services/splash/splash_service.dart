@@ -3,19 +3,19 @@ import 'package:http/http.dart' as http;
 import 'splash_model.dart';
 
 class SplashService {
-  Future<List<SplashModel>> fetchSplash() async {
+  static Future<List<SplashModel>> fetchSplashData() async {
     final response = await http.get(
       Uri.parse("https://api.ppb.widiarrohman.my.id/api/2026/uts/A/kelompok4/splash-screen"),
     );
 
     if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
+      final data = json.decode(response.body);
 
-      List data = jsonData['data'];
+      List list = data['data'];
 
-      return data.map((e) => SplashModel.fromJson(e)).toList();
+      return list.map((e) => SplashModel.fromJson(e)).toList();
     } else {
-      throw Exception("Gagal ambil data");
+      throw Exception("Gagal load splash data");
     }
   }
 }
