@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       ),
 
       // halaman awal
-      initialRoute: '/splash',
+      initialRoute: '/welcome',
 
       // routing semua halaman
       routes: {

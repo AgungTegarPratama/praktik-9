@@ -1,23 +1,69 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 
-class ChatWelcomeScreen extends StatelessWidget {
+class ChatWelcomeScreen extends StatefulWidget {
   const ChatWelcomeScreen({super.key});
 
   @override
+  State<ChatWelcomeScreen> createState() => _ChatWelcomeScreenState();
+}
+
+class _ChatWelcomeScreenState extends State<ChatWelcomeScreen> {
+
+  String apiMessage = "Checking API...";
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    checkAPI();
+  }
+
+  Future<void> checkAPI() async {
+    try {
+      final result = await ApiService.checkKelompok4();
+
+      setState(() {
+        apiMessage = result;
+        isLoading = false;
+      });
+
+    } catch (e) {
+      print("ERROR: $e");
+
+      setState(() {
+        apiMessage = "API gagal terhubung";
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
+
             const Spacer(flex: 2),
+
             Image.asset(
-            "assets/images/splash-4.png",
-            height: 300,
-            width: double.infinity,
-            fit: BoxFit.contain,
-          ),
+              "assets/images/splash-4.png",
+              height: 300,
+              width: double.infinity,
+              fit: BoxFit.contain,
+            ),
+
             const Spacer(flex: 3),
+
             Text(
               "Welcome to our freedom \nmessaging app",
               textAlign: TextAlign.center,
@@ -26,21 +72,26 @@ class ChatWelcomeScreen extends StatelessWidget {
                   .headlineSmall!
                   .copyWith(fontWeight: FontWeight.bold),
             ),
+
             const Spacer(),
-            Text(
-              "Freedom talk any person of your \nmother language.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
-                    .color!
-                    .withOpacity(0.64),
+
+            /// 🔥 HASIL API
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                apiMessage,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: apiMessage.contains("gagal")
+                      ? Colors.red
+                      : Colors.green,
+                ),
               ),
             ),
+
             const Spacer(flex: 3),
 
-            /// 🔥 TOMBOL SUDAH ADA AKSI
             TextButton.icon(
               onPressed: () {
                 Navigator.pushNamed(context, '/onboarding');

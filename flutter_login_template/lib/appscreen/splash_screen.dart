@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../services/splash/splash_service.dart';
+import '../services/splash/splash_model.dart';
+import '../services/api_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -10,52 +13,76 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   int currentPage = 0;
 
-  List<Map<String, String>> splashData = [
-    {
-      "text": "Welcome to Tokoto, Let’s shop!",
-      "image": "assets/images/splash-1.png"
-    },
-    {
-      "text":
-          "We help people conect with store \naround United State of America",
-      "image": "assets/images/splash-2.png"
-    },
-    {
-      "text": "We show the easy way to shop. \nJust stay at home with us",
-      "image": "assets/images/splash-3.png"
-    },
-  ];
+  List<SplashModel> splashData = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadSplashData();
+  }
+
+  Future<void> loadSplashData() async {
+    try {
+      final data = await SplashService.fetchSplashData();
+
+      setState(() {
+        splashData = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      print(e);
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       body: SafeArea(
         child: SizedBox(
           width: double.infinity,
           child: Column(
             children: [
+
               Expanded(
                 flex: 3,
                 child: PageView.builder(
+                  itemCount: splashData.length,
+
                   onPageChanged: (value) {
                     setState(() {
                       currentPage = value;
                     });
                   },
-                  itemCount: splashData.length,
-                  itemBuilder: (context, index) => SplashContent(
-                    image: splashData[index]["image"],
-                    text: splashData[index]['text'],
-                  ),
+
+                  itemBuilder: (context, index) {
+                    return SplashContent(
+                      image: splashData[index].imageUrl,
+                      text: splashData[index].title,
+                      desc: splashData[index].description,
+                    );
+                  },
                 ),
               ),
+
               Expanded(
                 flex: 2,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
-                    children: <Widget>[
+                    children: [
+
                       const Spacer(),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
@@ -74,9 +101,9 @@ class _SplashScreenState extends State<SplashScreen> {
                           ),
                         ),
                       ),
-                      const Spacer(flex: 3),
 
-                      /// 🔥 TOMBOL SUDAH ADA AKSI
+                      const Spacer(),
+
                       ElevatedButton(
                         onPressed: () {
                           Navigator.pushNamed(context, '/welcome');
@@ -95,10 +122,12 @@ class _SplashScreenState extends State<SplashScreen> {
                       ),
 
                       const Spacer(),
+
                     ],
                   ),
                 ),
               ),
+
             ],
           ),
         ),
@@ -107,25 +136,25 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-class SplashContent extends StatefulWidget {
+class SplashContent extends StatelessWidget {
+  final String? text;
+  final String? image;
+  final String? desc;
+
   const SplashContent({
-    Key? key,
+    super.key,
     this.text,
     this.image,
-  }) : super(key: key);
+    this.desc,
+  });
 
-  final String? text, image;
-
-  @override
-  State<SplashContent> createState() => _SplashContentState();
-}
-
-class _SplashContentState extends State<SplashContent> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: <Widget>[
+      children: [
+
         const Spacer(),
+
         const Text(
           "TOKOTO",
           style: TextStyle(
@@ -134,17 +163,29 @@ class _SplashContentState extends State<SplashContent> {
             fontWeight: FontWeight.bold,
           ),
         ),
+
         Text(
-          widget.text!,
+          text ?? '',
           textAlign: TextAlign.center,
         ),
+
+        const SizedBox(height: 10),
+
+        Text(
+          desc ?? '',
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.grey),
+        ),
+
         const Spacer(flex: 2),
-        Image.asset(
-  widget.image!,
-  fit: BoxFit.contain,
-  height: 265,
-  width: 235,
-),
+
+        Image.network(
+          image ?? '',
+          height: 265,
+          width: 235,
+          fit: BoxFit.contain,
+        ),
+
       ],
     );
   }
