@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../services/get_started/get_started_service.dart';
 import '../services/get_started/get_started_model.dart';
+import '../services/api_service.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -14,14 +15,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   bool _isLoading = true;
   late Future<GetStartedModel> _data;
 
+  // ✅ LOGS
+  List<String> logs = [];
+
   @override
   void initState() {
     super.initState();
 
-    // ambil data API
     _data = GetStartedService().fetchData();
 
-    // delay biar tetap ada efek loading 2 detik
+    fetchLogs(); // 🔥 jalan otomatis
+
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
@@ -29,6 +33,34 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         });
       }
     });
+  }
+
+  // ✅ STREAM LOGS
+  void fetchLogs() async {
+    try {
+      final stream = await ApiService.getLogs();
+
+      stream.listen((line) {
+        if (line.startsWith('data:')) {
+          final clean = line.replaceFirst('data: ', '');
+
+          setState(() {
+            logs.add(clean);
+          });
+
+          // 🔥 AUTO PINDAH KE CHAT
+          if (clean.contains('Selesai')) {
+            Future.delayed(const Duration(seconds: 1), () {
+              if (mounted) {
+                Navigator.pushNamed(context, '/chat');
+              }
+            });
+          }
+        }
+      });
+    } catch (e) {
+      print("Error logs: $e");
+    }
   }
 
   @override
@@ -39,7 +71,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         child: FutureBuilder<GetStartedModel>(
           future: _data,
           builder: (context, snapshot) {
-            
+
             // 🔄 Loading
             if (_isLoading || snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
@@ -56,7 +88,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               );
             }
 
-            // ✅ Data dari API
             final data = snapshot.data!;
 
             return Padding(
@@ -65,7 +96,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 children: [
                   const Spacer(flex: 2),
 
-                  // 🖼️ Gambar dari API (fallback ke SVG kalau gagal)
+                  // 🖼️ IMAGE
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: AspectRatio(
@@ -85,27 +116,27 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
                   const Spacer(flex: 2),
 
-                  // 📝 Title & Description dari API
+                  // 📝 TEXT API (TANPA BUTTON)
                   ErrorInfo(
                     title: data.title,
                     description: data.description,
-                    button: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/chat');
+                    press: () {}, // tidak dipakai
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // ✅ LOGS (JADI PENGGANTI BUTTON)
+                  SizedBox(
+                    height: 120,
+                    child: ListView.builder(
+                      itemCount: logs.length,
+                      itemBuilder: (context, index) {
+                        return Text(
+                          "• ${logs[index]}",
+                          style: const TextStyle(fontSize: 12),
+                        );
                       },
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 48),
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8)),
-                        ),
-                      ),
-                      child: const Text("CONTINUE"),
                     ),
-                    press: () {
-                      Navigator.pushNamed(context, '/chat');
-                    },
                   ),
 
                   const SizedBox(height: 16),
@@ -158,20 +189,6 @@ class ErrorInfo extends StatelessWidget {
               description,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16 * 2.5),
-            button ??
-                ElevatedButton(
-                  onPressed: press,
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 48),
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
-                  ),
-                  child: Text((btnText ?? "Retry").toUpperCase()),
-                ),
             const SizedBox(height: 16),
           ],
         ),
@@ -184,4 +201,4 @@ const paymentProcessIllistration = '''
 <svg width="1080" height="1080" viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M590.84 242.27H877.06C880.922 242.27 884.625 243.804 887.355 246.535C890.086 249.265 891.62 252.968 891.62 256.83V543C891.62 546.862 890.086 550.565 887.355 553.295C884.625 556.026 880.922 557.56 877.06 557.56H805.37C744.62 557.56 686.358 533.431 643.397 490.479C600.435 447.527 576.293 389.27 576.28 328.52V256.83C576.28 252.968 577.814 249.265 580.545 246.535C583.275 243.804 586.978 242.27 590.84 242.27Z" fill="#E5E5E5"/>
 </svg>
-'''; 
+''';
