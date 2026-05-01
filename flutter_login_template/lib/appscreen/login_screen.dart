@@ -25,10 +25,7 @@ class SignInScreen extends StatelessWidget {
 
                   const Text(
                     "Welcome Back",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 8),
