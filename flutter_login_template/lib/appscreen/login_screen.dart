@@ -53,3 +53,72 @@ class SignInScreen extends StatelessWidget {
     );
   }
 }
+
+@override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          // USERNAME
+          TextFormField(
+            decoration: InputDecoration(
+              hintText: "Enter your username",
+              labelText: "Username",
+              suffix: SvgPicture.string(mailIcon),
+              border: authOutlineInputBorder,
+              enabledBorder: authOutlineInputBorder,
+              focusedBorder: authOutlineInputBorder.copyWith(
+                borderSide: const BorderSide(color: Color(0xFFFF7643)),
+              ),
+            ),
+            onSaved: (value) => username = value ?? "",
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Username wajib diisi";
+              }
+              return null;
+            },
+          ),
+
+          const SizedBox(height: 20),
+
+          // PASSWORD
+          TextFormField(
+            obscureText: true,
+            decoration: InputDecoration(
+              hintText: "Enter your password",
+              labelText: "Password",
+              suffix: SvgPicture.string(lockIcon),
+              border: authOutlineInputBorder,
+              enabledBorder: authOutlineInputBorder,
+              focusedBorder: authOutlineInputBorder.copyWith(
+                borderSide: const BorderSide(color: Color(0xFFFF7643)),
+              ),
+            ),
+            onSaved: (value) => password = value ?? "",
+            validator: (value) =>
+                value!.isEmpty ? "Password wajib diisi" : null,
+          ),
+
+          const SizedBox(height: 20),
+
+          ElevatedButton(
+            onPressed: isLoading ? null : handleLogin,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF7643),
+              minimumSize: const Size(double.infinity, 50),
+            ),
+            child: isLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text("Login"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ICONS (biarkan seperti ini)
+const mailIcon = '''<svg width="18" height="13" ...></svg>''';
+const lockIcon = '''<svg width="15" height="18" ...></svg>''';
