@@ -45,7 +45,7 @@ class ApiService {
       throw Exception("Gagal ambil logs");
     }
   }
-}
+
 // 🟡 LOGIN (USERNAME + PASSWORD)
   static Future<bool> login(String username, String password) async {
     final url = Uri.parse(
@@ -91,3 +91,42 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString("token");
   }
+  // 🚪 LOGOUT
+  static Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove("token");
+  }
+
+  // 👤 GET PROFILE
+  static Future<Map<String, dynamic>?> getProfile() async {
+    final url = Uri.parse(
+      'https://api.ppb.widiarrohman.my.id/api/2026/uts/A/kelompok4/user/profile'
+    );
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("token");
+
+      final response = await http.get(
+        url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+      );
+
+      print("STATUS PROFILE: ${response.statusCode}");
+      print("BODY PROFILE: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data["data"];
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print("ERROR PROFILE: $e");
+      return null;
+    }
+  }
+}
