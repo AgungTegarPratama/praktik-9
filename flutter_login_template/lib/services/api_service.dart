@@ -46,3 +46,48 @@ class ApiService {
     }
   }
 }
+// 🟡 LOGIN (USERNAME + PASSWORD)
+  static Future<bool> login(String username, String password) async {
+    final url = Uri.parse(
+      'https://api.ppb.widiarrohman.my.id/api/2026/uts/A/kelompok4/login'
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json", // ✅ JSON
+        },
+        body: jsonEncode({
+          "username": username,
+          "password": password,
+        }),
+      );
+
+      print("STATUS LOGIN: ${response.statusCode}");
+      print("BODY LOGIN: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // 🔥 SIMPAN TOKEN
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("token", data["token"]);
+
+        print("TOKEN: ${data["token"]}");
+
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print("ERROR LOGIN: $e");
+      return false;
+    }
+  }
+
+  // 🔐 AMBIL TOKEN
+  static Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString("token");
+  }
