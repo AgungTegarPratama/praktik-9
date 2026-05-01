@@ -54,7 +54,50 @@ class SignInScreen extends StatelessWidget {
   }
 }
 
-@override
+const authOutlineInputBorder = OutlineInputBorder(
+  borderSide: BorderSide(color: Color(0xFF757575)),
+  borderRadius: BorderRadius.all(Radius.circular(100)),
+);
+
+class SignInForm extends StatefulWidget {
+  const SignInForm({super.key});
+
+  @override
+  State<SignInForm> createState() => _SignInFormState();
+}
+
+class _SignInFormState extends State<SignInForm> {
+  final _formKey = GlobalKey<FormState>();
+
+  String username = "";
+  String password = "";
+  bool isLoading = false;
+
+  void handleLogin() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    _formKey.currentState!.save();
+
+    setState(() => isLoading = true);
+
+    bool success = await ApiService.login(username, password);
+
+    setState(() => isLoading = false);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Login berhasil")),
+      );
+
+      Navigator.pushReplacementNamed(context, '/profile');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Login gagal")),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
